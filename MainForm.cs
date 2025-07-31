@@ -165,11 +165,17 @@ public partial class MainForm : Form
 
     private async Task FetchPageInformation()
     {
-        // Check if we have valid settings
-        if (string.IsNullOrWhiteSpace(settings.ConfluenceUrl) ||
-            string.IsNullOrWhiteSpace(settings.Username) ||
-            string.IsNullOrWhiteSpace(settings.ApiToken))
-            return; // Don't fetch if settings aren't configured
+        // Check if we have valid settings based on auth type
+        if (string.IsNullOrWhiteSpace(settings.ConfluenceUrl)) return; // Don't fetch if URL isn't configured
+
+        var hasValidAuth = false;
+        if (settings.AuthType == AuthenticationType.ApiKey)
+            hasValidAuth = !string.IsNullOrWhiteSpace(settings.ApiKey);
+        else
+            hasValidAuth = !string.IsNullOrWhiteSpace(settings.Username) &&
+                           !string.IsNullOrWhiteSpace(settings.Password);
+
+        if (!hasValidAuth) return; // Don't fetch if authentication isn't configured
 
         // Rate limiting
         var timeSinceLastCall = DateTime.Now - lastApiCall;
@@ -184,7 +190,12 @@ public partial class MainForm : Form
             {
                 var confluenceUri = new Uri(settings.ConfluenceUrl.TrimEnd('/'));
                 confluenceClient = ConfluenceClient.Create(confluenceUri);
-                confluenceClient.SetBasicAuthentication(settings.Username, settings.ApiToken);
+
+                // Set authentication based on type
+                if (settings.AuthType == AuthenticationType.ApiKey)
+                    confluenceClient.SetBearerAuthentication(settings.ApiKey);
+                else
+                    confluenceClient.SetBasicAuthentication(settings.Username, settings.Password);
             }
 
             // Fetch copy from page info
@@ -364,13 +375,31 @@ public partial class MainForm : Form
 
     private async void BtnCopy_Click(object? sender, EventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(settings.ConfluenceUrl) ||
-            string.IsNullOrWhiteSpace(settings.Username) ||
-            string.IsNullOrWhiteSpace(settings.ApiToken))
+        // Check if we have valid settings based on auth type
+        if (string.IsNullOrWhiteSpace(settings.ConfluenceUrl))
         {
             MessageBox.Show("Please configure your Confluence settings first using the Settings button.",
                 "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
+        }
+
+        if (settings.AuthType == AuthenticationType.ApiKey)
+        {
+            if (string.IsNullOrWhiteSpace(settings.ApiKey))
+            {
+                MessageBox.Show("Please configure your API key in the Settings.",
+                    "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+        }
+        else
+        {
+            if (string.IsNullOrWhiteSpace(settings.Username) || string.IsNullOrWhiteSpace(settings.Password))
+            {
+                MessageBox.Show("Please configure your username and password in the Settings.",
+                    "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
         }
 
         if (string.IsNullOrWhiteSpace(txtCopyFromPage.Text) ||
@@ -404,8 +433,6 @@ public partial class MainForm : Form
     private async Task CopyPageContent()
     {
         var baseUrl = settings.ConfluenceUrl.TrimEnd('/');
-        var username = settings.Username;
-        var apiToken = settings.ApiToken;
 
         // Extract page IDs from input (supports both IDs and URLs)
         var copyFromPageId = ExtractPageId(txtCopyFromPage.Text);
@@ -414,7 +441,12 @@ public partial class MainForm : Form
         // Initialize Confluence client
         var confluenceUri = new Uri(baseUrl);
         confluenceClient = ConfluenceClient.Create(confluenceUri);
-        confluenceClient.SetBasicAuthentication(username, apiToken);
+
+        // Set authentication based on type
+        if (settings.AuthType == AuthenticationType.ApiKey)
+            confluenceClient.SetBearerAuthentication(settings.ApiKey);
+        else
+            confluenceClient.SetBasicAuthentication(settings.Username, settings.Password);
 
         lblStatus.Text = "Fetching copy from page content...";
 

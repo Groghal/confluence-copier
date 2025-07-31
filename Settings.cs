@@ -2,11 +2,19 @@ using System.Text.Json;
 
 namespace ConfluenceCopier;
 
+public enum AuthenticationType
+{
+    Password,
+    ApiKey
+}
+
 public class AppSettings
 {
     public string ConfluenceUrl { get; set; } = "";
     public string Username { get; set; } = "";
-    public string ApiToken { get; set; } = "";
+    public string Password { get; set; } = "";
+    public AuthenticationType AuthType { get; set; } = AuthenticationType.Password;
+    public string ApiKey { get; set; } = "";
 
     private static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
