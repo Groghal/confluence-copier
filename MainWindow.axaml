@@ -1,0 +1,197 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ConfluenceCopier.MainWindow"
+        Title="Confluence Page Copier"
+        Width="650"
+        Height="380"
+        MinWidth="600"
+        MinHeight="350"
+        WindowStartupLocation="CenterScreen"
+        CanResize="True"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="None"
+        Background="{StaticResource WindowBackgroundBrush}">
+
+    <Border BorderBrush="{StaticResource WindowBorderBrush}" 
+            BorderThickness="1" 
+            CornerRadius="8"
+            Classes="windowBorder">
+        <Grid>
+            <!-- Custom Title Bar -->
+        <Grid Name="TitleBar"
+              Height="35" 
+              VerticalAlignment="Top" 
+              Classes="titleBar"
+              ZIndex="100"
+              PointerPressed="TitleBar_PointerPressed"
+              DoubleTapped="TitleBar_DoubleTapped">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- App Icon and Title -->
+            <StackPanel Grid.Column="0" 
+                        Orientation="Horizontal" 
+                        VerticalAlignment="Center" 
+                        Margin="10,0,0,0">
+                <TextBlock Text="📄" 
+                           FontSize="16" 
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center"
+                           Margin="0,0,8,0"/>
+                <TextBlock Text="Confluence Page Copier" 
+                           FontSize="13" 
+                           FontWeight="Medium"
+                           Foreground="{StaticResource PrimaryTextBrush}" 
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"/>
+            </StackPanel>
+            
+            <!-- Window Controls -->
+            <StackPanel Grid.Column="2" 
+                        Orientation="Horizontal" 
+                        VerticalAlignment="Stretch">
+                <Button Name="MinimizeButton" 
+                        Width="45" 
+                        Height="35"
+                        Classes="titleBarButton"
+                        Content="─" 
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource PrimaryTextBrush}"
+                        Click="MinimizeButton_Click"/>
+                <Button Name="MaximizeButton" 
+                        Width="45" 
+                        Height="35"
+                        Classes="titleBarButton"
+                        Content="□" 
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource PrimaryTextBrush}"
+                        Click="MaximizeButton_Click"/>
+                <Button Name="CloseButton" 
+                        Width="45" 
+                        Height="35"
+                        Classes="titleBarButton closeButton"
+                        Content="✕" 
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource PrimaryTextBrush}"
+                        Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Main Content -->
+        <Grid Margin="20,50,20,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="130"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Settings Button -->
+        <Button Name="btnSettings" 
+                Grid.Row="0" 
+                Grid.Column="2" 
+                Content="⚙️ Settings" 
+                Width="120" 
+                Height="38"
+                FontSize="14"
+                FontWeight="Medium"
+                Click="BtnSettings_Click"/>
+
+        <!-- Copy From Section -->
+        <TextBlock Grid.Row="2" 
+                   Grid.Column="0" 
+                   Text="Copy From:" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        
+        <TextBlock Name="lblCopyFromPath" 
+                   Grid.Row="2" 
+                   Grid.Column="1" 
+                   Grid.ColumnSpan="2"
+                   Text="Select a page to see its path" 
+                   Classes="subtitle"
+                   FontSize="11" 
+                   VerticalAlignment="Center"/>
+
+        <TextBox Name="txtCopyFromPage" 
+                 Grid.Row="3" 
+                 Grid.Column="1" 
+                 Grid.ColumnSpan="2"
+                 Watermark="Enter page ID or URL (e.g., 123456 or https://company.atlassian.net/wiki/spaces/...)"
+                 TextChanged="TxtCopyFromPage_TextChanged"/>
+
+        <!-- Copy To Section -->
+        <TextBlock Grid.Row="5" 
+                   Grid.Column="0" 
+                   Text="Copy To:" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        
+        <TextBlock Name="lblCopyToPath" 
+                   Grid.Row="5" 
+                   Grid.Column="1" 
+                   Grid.ColumnSpan="2"
+                   Text="Select a page to see its path" 
+                   Classes="subtitle"
+                   FontSize="11" 
+                   VerticalAlignment="Center"/>
+
+        <TextBox Name="txtCopyToPage" 
+                 Grid.Row="6" 
+                 Grid.Column="1" 
+                 Grid.ColumnSpan="2"
+                 Watermark="Enter page ID or URL (e.g., 123456 or https://company.atlassian.net/wiki/spaces/...)"
+                 TextChanged="TxtCopyToPage_TextChanged"/>
+
+        <!-- Copy Button -->
+        <Button Name="btnCopy" 
+                Grid.Row="8" 
+                Grid.Column="1" 
+                Content="📄 Copy From → Copy To" 
+                Width="240" 
+                Height="44"
+                HorizontalAlignment="Center"
+                FontSize="15"
+                FontWeight="SemiBold"
+                Click="BtnCopy_Click"/>
+
+        <!-- Status Section -->
+        <StackPanel Grid.Row="10" 
+                    Grid.Column="0" 
+                    Grid.ColumnSpan="3" 
+                    Orientation="Horizontal">
+            <TextBlock Text="Status:" 
+                       Foreground="{StaticResource PrimaryTextBrush}" 
+                       VerticalAlignment="Center"/>
+            <TextBlock Name="lblStatus" 
+                       Text="Ready" 
+                       Foreground="{StaticResource StatusReadyBrush}" 
+                       Margin="5,0,0,0" 
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+        </Grid>
+        </Grid>
+    </Border>
+</Window>

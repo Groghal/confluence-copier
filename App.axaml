@@ -1,0 +1,183 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ConfluenceCopier.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Resources>
+        <!-- ============= UNIFIED COLOR SYSTEM ============= -->
+        <!-- Change these colors to instantly update the entire app theme -->
+        
+        <!-- Background Colors (Cursor Dark Theme) -->
+        <Color x:Key="WindowBackgroundColor">#FF1E1E1E</Color>           <!-- Main editor background -->
+        <Color x:Key="ControlBackgroundColor">#FF252526</Color>          <!-- Sidebar/panel background -->
+        <Color x:Key="ButtonBackgroundColor">#FF2D2D30</Color>           <!-- Button background -->
+        <Color x:Key="TitleBarStartColor">#FF3E3E42</Color>              <!-- Title bar gradient start -->
+        <Color x:Key="TitleBarEndColor">#FF2D2D30</Color>                <!-- Title bar gradient end -->
+        
+        <!-- Text Colors (Cursor Dark Theme) -->
+        <Color x:Key="PrimaryTextColor">#FFCCCCCC</Color>                <!-- Primary text (slightly dimmed white) -->
+        <Color x:Key="SubtitleTextColor">#FF9DA5B4</Color>               <!-- Subtle grey for secondary text -->
+        
+        <!-- Border Colors (Cursor Dark Theme) -->
+        <Color x:Key="BorderColor">#FF464647</Color>                     <!-- Subtle borders -->
+        <Color x:Key="FocusBorderColor">#FF007ACC</Color>                <!-- VSCode blue accent -->
+        
+        <!-- Hover States (Cursor Dark Theme) -->
+        <Color x:Key="ButtonHoverColor">#FF37373D</Color>                <!-- Subtle button hover -->
+        <Color x:Key="ButtonPressedColor">#FF262629</Color>              <!-- Button pressed state -->
+        <Color x:Key="ControlFocusColor">#FF37373D</Color>               <!-- Control focus background -->
+        <Color x:Key="TitleBarHoverColor">#FF474748</Color>              <!-- Title bar button hover -->
+        <Color x:Key="TitleBarPressedColor">#FF37373D</Color>            <!-- Title bar button pressed -->
+        
+        <!-- Special Colors (Cursor Dark Theme) -->
+        <Color x:Key="CloseButtonHoverColor">#FFE81123</Color>           <!-- Keep close button red -->
+        <Color x:Key="CloseButtonPressedColor">#FFC50E1F</Color>         <!-- Keep close button pressed red -->
+        <Color x:Key="HoverBorderColor">#FF6C6C6C</Color>                <!-- Lighter border on hover -->
+        <Color x:Key="PressedBorderColor">#FF464647</Color>              <!-- Border on press -->
+        
+        <!-- Window Border Colors (Cursor Dark Theme) -->
+        <Color x:Key="WindowBorderColor">#FF454545</Color>               <!-- Main window border -->
+        <Color x:Key="DialogBorderColor">#FF565656</Color>               <!-- Dialog window border (slightly lighter) -->
+        
+        <!-- Status Colors (Cursor Dark Theme) -->
+        <Color x:Key="StatusReadyColor">#FF007ACC</Color>                <!-- VSCode blue -->
+        <Color x:Key="StatusSuccessColor">#FF4EC9B0</Color>             <!-- Cyan-green for success -->
+        <Color x:Key="StatusWarningColor">#FFDCDCAA</Color>             <!-- Light yellow for warnings -->
+        <Color x:Key="StatusErrorColor">#FFF44747</Color>               <!-- Red for errors -->
+        
+        <!-- Convert colors to brushes for easy use -->
+        <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource WindowBackgroundColor}"/>
+        <SolidColorBrush x:Key="ControlBackgroundBrush" Color="{StaticResource ControlBackgroundColor}"/>
+        <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="{StaticResource ButtonBackgroundColor}"/>
+        <SolidColorBrush x:Key="PrimaryTextBrush" Color="{StaticResource PrimaryTextColor}"/>
+        <SolidColorBrush x:Key="SubtitleTextBrush" Color="{StaticResource SubtitleTextColor}"/>
+        <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource BorderColor}"/>
+        <SolidColorBrush x:Key="FocusBorderBrush" Color="{StaticResource FocusBorderColor}"/>
+        <SolidColorBrush x:Key="ButtonHoverBrush" Color="{StaticResource ButtonHoverColor}"/>
+        <SolidColorBrush x:Key="ButtonPressedBrush" Color="{StaticResource ButtonPressedColor}"/>
+        <SolidColorBrush x:Key="ControlFocusBrush" Color="{StaticResource ControlFocusColor}"/>
+        <SolidColorBrush x:Key="TitleBarHoverBrush" Color="{StaticResource TitleBarHoverColor}"/>
+        <SolidColorBrush x:Key="TitleBarPressedBrush" Color="{StaticResource TitleBarPressedColor}"/>
+        <SolidColorBrush x:Key="CloseButtonHoverBrush" Color="{StaticResource CloseButtonHoverColor}"/>
+        <SolidColorBrush x:Key="CloseButtonPressedBrush" Color="{StaticResource CloseButtonPressedColor}"/>
+        <SolidColorBrush x:Key="HoverBorderBrush" Color="{StaticResource HoverBorderColor}"/>
+        <SolidColorBrush x:Key="PressedBorderBrush" Color="{StaticResource PressedBorderColor}"/>
+        
+        <!-- Window Border Brushes -->
+        <SolidColorBrush x:Key="WindowBorderBrush" Color="{StaticResource WindowBorderColor}"/>
+        <SolidColorBrush x:Key="DialogBorderBrush" Color="{StaticResource DialogBorderColor}"/>
+        
+        <!-- Status Brushes -->
+        <SolidColorBrush x:Key="StatusReadyBrush" Color="{StaticResource StatusReadyColor}"/>
+        <SolidColorBrush x:Key="StatusSuccessBrush" Color="{StaticResource StatusSuccessColor}"/>
+        <SolidColorBrush x:Key="StatusWarningBrush" Color="{StaticResource StatusWarningColor}"/>
+        <SolidColorBrush x:Key="StatusErrorBrush" Color="{StaticResource StatusErrorColor}"/>
+        
+        <!-- Title Bar Gradient -->
+        <LinearGradientBrush x:Key="TitleBarBackgroundBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+            <GradientStop Color="{StaticResource TitleBarStartColor}" Offset="0"/>
+            <GradientStop Color="{StaticResource TitleBarEndColor}" Offset="1"/>
+        </LinearGradientBrush>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        
+        <!-- ============= UNIFIED STYLES USING COLOR RESOURCES ============= -->
+        <Style Selector="Window">
+            <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        </Style>
+        
+        <!-- Custom Title Bar Button Styles -->
+        <Style Selector="Button.titleBarButton">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="CornerRadius" Value="0"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        
+        <Style Selector="Button.titleBarButton:pointerover">
+            <Setter Property="Background" Value="{StaticResource TitleBarHoverBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.titleBarButton:pressed">
+            <Setter Property="Background" Value="{StaticResource TitleBarPressedBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.closeButton:pointerover">
+            <Setter Property="Background" Value="{StaticResource CloseButtonHoverBrush}"/>
+        </Style>
+        
+        <Style Selector="Button.closeButton:pressed">
+            <Setter Property="Background" Value="{StaticResource CloseButtonPressedBrush}"/>
+        </Style>
+        
+        <!-- Title bar gradient effect -->
+        <Style Selector="Grid.titleBar">
+            <Setter Property="Background" Value="{StaticResource TitleBarBackgroundBrush}"/>
+        </Style>
+        
+        <!-- Window Border Styles -->
+        <Style Selector="Border.windowBorder">
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="Black" BlurRadius="10" Opacity="0.3" OffsetX="2" OffsetY="2"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        
+        <Style Selector="Grid">
+            <Setter Property="Background" Value="{StaticResource WindowBackgroundBrush}"/>
+        </Style>
+        
+        <Style Selector="TextBox">
+            <Setter Property="Background" Value="{StaticResource ControlBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="8,6"/>
+        </Style>
+        
+        <Style Selector="TextBox:focus">
+            <Setter Property="BorderBrush" Value="{StaticResource FocusBorderBrush}"/>
+            <Setter Property="Background" Value="{StaticResource ControlFocusBrush}"/>
+        </Style>
+        
+        <Style Selector="Button">
+            <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+        
+        <Style Selector="Button:pointerover">
+            <Setter Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource HoverBorderBrush}"/>
+        </Style>
+        
+        <Style Selector="Button:pressed">
+            <Setter Property="Background" Value="{StaticResource ButtonPressedBrush}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource PressedBorderBrush}"/>
+        </Style>
+        
+        <Style Selector="TextBlock">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        </Style>
+        
+        <Style Selector="TextBlock.subtitle">
+            <Setter Property="Foreground" Value="{StaticResource SubtitleTextBrush}"/>
+        </Style>
+        
+        <Style Selector="RadioButton">
+            <Setter Property="Foreground" Value="{StaticResource PrimaryTextBrush}"/>
+        </Style>
+    </Application.Styles>
+</Application>

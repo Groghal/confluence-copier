@@ -1,0 +1,218 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ConfluenceCopier.SettingsWindow"
+        Title="Confluence Settings"
+        Width="600"
+        Height="320"
+        MinWidth="580"
+        MinHeight="290"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ExtendClientAreaToDecorationsHint="True"
+        ExtendClientAreaChromeHints="NoChrome"
+        SystemDecorations="None"
+        Background="{StaticResource WindowBackgroundBrush}">
+
+    <Border BorderBrush="{StaticResource DialogBorderBrush}" 
+            BorderThickness="2" 
+            CornerRadius="8"
+            Classes="windowBorder">
+        <Grid>
+            <!-- Custom Title Bar -->
+        <Grid Name="TitleBar"
+              Height="35" 
+              VerticalAlignment="Top" 
+              Classes="titleBar"
+              ZIndex="100"
+              PointerPressed="TitleBar_PointerPressed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- App Icon and Title -->
+            <StackPanel Grid.Column="0" 
+                        Orientation="Horizontal" 
+                        VerticalAlignment="Center" 
+                        Margin="10,0,0,0">
+                <TextBlock Text="🔧" 
+                           FontSize="16" 
+                           VerticalAlignment="Center" 
+                           HorizontalAlignment="Center"
+                           Margin="0,0,8,0"/>
+                <TextBlock Text="Confluence Settings" 
+                           FontSize="13" 
+                           FontWeight="Medium"
+                           Foreground="{StaticResource PrimaryTextBrush}" 
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Left"/>
+            </StackPanel>
+            
+            <!-- Window Controls -->
+            <StackPanel Grid.Column="2" 
+                        Orientation="Horizontal" 
+                        VerticalAlignment="Stretch">
+                <Button Name="CloseButton" 
+                        Width="45" 
+                        Height="35"
+                        Classes="titleBarButton closeButton"
+                        Content="✕" 
+                        FontSize="16"
+                        FontWeight="Bold"
+                        Foreground="{StaticResource PrimaryTextBrush}"
+                        Click="CloseButton_Click"/>
+            </StackPanel>
+        </Grid>
+        
+        <!-- Main Content -->
+        <Grid Margin="20,50,20,20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="10"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Confluence URL -->
+        <TextBlock Grid.Row="0" 
+                   Grid.Column="0" 
+                   Text="Confluence URL:" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        <TextBox Name="txtConfluenceUrl" 
+                 Grid.Row="0" 
+                 Grid.Column="1" 
+                 Grid.ColumnSpan="2"
+                 Watermark="https://yourcompany.atlassian.net"/>
+
+        <!-- Username/Email -->
+        <TextBlock Name="lblUsername" 
+                   Grid.Row="2" 
+                   Grid.Column="0" 
+                   Text="Username/Email:" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        <TextBox Name="txtUsername" 
+                 Grid.Row="2" 
+                 Grid.Column="1" 
+                 Grid.ColumnSpan="2"
+                 Watermark="your.email@company.com"/>
+
+        <!-- Authentication Type -->
+        <TextBlock Grid.Row="4" 
+                   Grid.Column="0" 
+                   Text="Authentication:" 
+                   FontWeight="Bold" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        <StackPanel Grid.Row="4" 
+                    Grid.Column="1" 
+                    Grid.ColumnSpan="2" 
+                    Orientation="Horizontal" 
+                    Spacing="20">
+            <RadioButton Name="rbPassword" 
+                         Content="Username + Password" 
+                         IsChecked="True"
+                         Checked="RbAuthType_CheckedChanged"
+                         Unchecked="RbAuthType_CheckedChanged"/>
+            <RadioButton Name="rbApiKey" 
+                         Content="API Key"
+                         Checked="RbAuthType_CheckedChanged"
+                         Unchecked="RbAuthType_CheckedChanged"/>
+        </StackPanel>
+
+        <!-- Password Section -->
+        <TextBlock Name="lblPassword" 
+                   Grid.Row="6" 
+                   Grid.Column="0" 
+                   Text="Password:" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center"/>
+        <TextBox Name="txtPassword" 
+                 Grid.Row="6" 
+                 Grid.Column="1" 
+                 PasswordChar="*" 
+                 Watermark="Your Confluence password/API token"/>
+        <Button Name="btnShowHidePassword" 
+                Grid.Row="6" 
+                Grid.Column="2" 
+                Content="👁" 
+                Width="30" 
+                Height="23"
+                Click="BtnShowHidePassword_Click"/>
+
+        <!-- API Key Section -->
+        <TextBlock Name="lblApiKey" 
+                   Grid.Row="6" 
+                   Grid.Column="0" 
+                   Text="API Key:" 
+                   Foreground="{StaticResource PrimaryTextBrush}"
+                   VerticalAlignment="Center" 
+                   IsVisible="False"/>
+        <TextBox Name="txtApiKey" 
+                 Grid.Row="6" 
+                 Grid.Column="1" 
+                 PasswordChar="*" 
+                 Watermark="Your API key" 
+                 IsVisible="False"/>
+        <Button Name="btnShowHideApiKey" 
+                Grid.Row="6" 
+                Grid.Column="2" 
+                Content="👁" 
+                Width="30" 
+                Height="23" 
+                IsVisible="False"
+                Click="BtnShowHideApiKey_Click"/>
+
+        <!-- Test Connection Button -->
+        <Button Name="btnTestConnection" 
+                Grid.Row="8" 
+                Grid.Column="1" 
+                Content="🔗 Test Connection" 
+                Width="160" 
+                Height="38"
+                FontSize="14"
+                FontWeight="Medium"
+                Click="BtnTestConnection_Click"/>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="12" 
+                    Grid.Column="0" 
+                    Grid.ColumnSpan="3" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right" 
+                    Spacing="10">
+            <Button Name="btnSave" 
+                    Content="💾 Save" 
+                    Width="100" 
+                    Height="38"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    Click="BtnSave_Click"/>
+            <Button Name="btnCancel" 
+                    Content="❌ Cancel" 
+                    Width="100" 
+                    Height="38"
+                    FontSize="14"
+                    FontWeight="Medium"
+                    Click="BtnCancel_Click"/>
+        </StackPanel>
+        </Grid>
+        </Grid>
+    </Border>
+</Window>

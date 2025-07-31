@@ -1,152 +1,76 @@
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.Media;
+using Avalonia.Threading;
 using Dapplo.Confluence;
 using Dapplo.Confluence.Entities;
 using Dapplo.Confluence.Query;
-using Label = System.Windows.Forms.Label;
 
 namespace ConfluenceCopier;
 
-public partial class MainForm : Form
+public partial class MainWindow : Window
 {
-    private TextBox txtCopyFromPage = null!;
-    private TextBox txtCopyToPage = null!;
-    private Button btnCopy = null!;
-    private Button btnSettings = null!;
-    private Label lblCopyFromPage = null!;
-    private Label lblCopyToPage = null!;
-    private Label lblCopyFromPath = null!;
-    private Label lblCopyToPath = null!;
-    private Label lblStatusLabel = null!;
-    private Label lblStatus = null!;
+
 
     private AppSettings settings;
     private IConfluenceClient? confluenceClient;
-    private System.Windows.Forms.Timer? debounceTimer;
+    private DispatcherTimer? debounceTimer;
     private DateTime lastApiCall = DateTime.MinValue;
     private readonly TimeSpan apiRateLimit = TimeSpan.FromSeconds(1);
 
-    public MainForm()
+    public MainWindow()
     {
-        settings = AppSettings.Load();
         InitializeComponent();
+        settings = AppSettings.Load();
+        InitializeControls();
     }
 
-    private void InitializeComponent()
+    private void InitializeControls()
     {
-        Text = "Confluence Page Copier";
-        Size = new Size(600, 350);
-        StartPosition = FormStartPosition.CenterScreen;
-
-        // Settings Button
-        btnSettings = new Button
-        {
-            Text = "⚙ Settings",
-            Location = new Point(480, 20),
-            Size = new Size(100, 30),
-            FlatStyle = FlatStyle.Standard
-        };
-        btnSettings.Click += BtnSettings_Click;
-        Controls.Add(btnSettings);
-
-        // Copy From Section
-        lblCopyFromPage = new Label
-        {
-            Text = "Copy From:",
-            Location = new Point(20, 70),
-            Size = new Size(120, 23),
-            Font = new Font(Font, FontStyle.Bold)
-        };
-        Controls.Add(lblCopyFromPage);
-
-        lblCopyFromPath = new Label
-        {
-            Text = "Select a page to see its path",
-            Location = new Point(150, 70),
-            Size = new Size(430, 20),
-            ForeColor = Color.Gray,
-            Font = new Font(Font.FontFamily, Font.Size - 1)
-        };
-        Controls.Add(lblCopyFromPath);
-
-        txtCopyFromPage = new TextBox
-        {
-            Location = new Point(150, 95),
-            Size = new Size(430, 23),
-            PlaceholderText = "Enter page ID or URL (e.g., 123456 or https://company.atlassian.net/wiki/spaces/...)"
-        };
-        txtCopyFromPage.TextChanged += TxtCopyFromPage_TextChanged;
-        Controls.Add(txtCopyFromPage);
-
-        // Copy To Section
-        lblCopyToPage = new Label
-        {
-            Text = "Copy To:",
-            Location = new Point(20, 135),
-            Size = new Size(120, 23),
-            Font = new Font(Font, FontStyle.Bold)
-        };
-        Controls.Add(lblCopyToPage);
-
-        lblCopyToPath = new Label
-        {
-            Text = "Select a page to see its path",
-            Location = new Point(150, 135),
-            Size = new Size(430, 20),
-            ForeColor = Color.Gray,
-            Font = new Font(Font.FontFamily, Font.Size - 1)
-        };
-        Controls.Add(lblCopyToPath);
-
-        txtCopyToPage = new TextBox
-        {
-            Location = new Point(150, 160),
-            Size = new Size(430, 23),
-            PlaceholderText = "Enter page ID or URL (e.g., 123456 or https://company.atlassian.net/wiki/spaces/...)"
-        };
-        txtCopyToPage.TextChanged += TxtCopyToPage_TextChanged;
-        Controls.Add(txtCopyToPage);
-
-        // Copy Button
-        btnCopy = new Button
-        {
-            Text = "Copy From → Copy To",
-            Location = new Point(200, 200),
-            Size = new Size(200, 35)
-        };
-        btnCopy.Click += BtnCopy_Click;
-        Controls.Add(btnCopy);
-
-        // Status Label
-        lblStatusLabel = new Label
-        {
-            Text = "Status:",
-            Location = new Point(20, 250),
-            Size = new Size(50, 20),
-            ForeColor = Color.Black
-        };
-        Controls.Add(lblStatusLabel);
-
-        lblStatus = new Label
-        {
-            Text = "Ready",
-            Location = new Point(75, 250),
-            Size = new Size(500, 40),
-            ForeColor = Color.Blue
-        };
-        Controls.Add(lblStatus);
         // Initialize debounce timer
-        debounceTimer = new System.Windows.Forms.Timer();
-        debounceTimer.Interval = 1000; // 1 second delay
+        debounceTimer = new DispatcherTimer();
+        debounceTimer.Interval = TimeSpan.FromSeconds(1);
         debounceTimer.Tick += DebounceTimer_Tick;
     }
 
-    private void TxtCopyFromPage_TextChanged(object? sender, EventArgs e)
+    private void MinimizeButton_Click(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState.Minimized;
+    }
+
+    private void MaximizeButton_Click(object? sender, RoutedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void CloseButton_Click(object? sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
+    private void TitleBar_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
+        {
+            BeginMoveDrag(e);
+        }
+    }
+
+    private void TitleBar_DoubleTapped(object? sender, TappedEventArgs e)
+    {
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+    }
+
+    private void TxtCopyFromPage_TextChanged(object? sender, TextChangedEventArgs e)
     {
         RestartDebounceTimer();
     }
 
-    private void TxtCopyToPage_TextChanged(object? sender, EventArgs e)
+    private void TxtCopyToPage_TextChanged(object? sender, TextChangedEventArgs e)
     {
         RestartDebounceTimer();
     }
@@ -210,20 +134,29 @@ public partial class MainForm : Form
                     if (copyFromPage != null)
                     {
                         var copyFromHierarchy = await GetPageHierarchy(copyFromPage);
-                        lblCopyFromPath.Text = copyFromHierarchy;
-                        lblCopyFromPath.ForeColor = Color.DarkBlue;
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            lblCopyFromPath.Text = copyFromHierarchy;
+                            lblCopyFromPath.Foreground = (IBrush?)Application.Current?.FindResource("StatusSuccessBrush") ?? Brushes.DarkBlue;
+                        });
                     }
                 }
                 catch
                 {
-                    lblCopyFromPath.Text = "Invalid page or page not found";
-                    lblCopyFromPath.ForeColor = Color.Red;
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        lblCopyFromPath.Text = "Invalid page or page not found";
+                        lblCopyFromPath.Foreground = (IBrush?)Application.Current?.FindResource("StatusErrorBrush") ?? Brushes.Red;
+                    });
                 }
             }
             else
             {
-                lblCopyFromPath.Text = "Select a page to see its path";
-                lblCopyFromPath.ForeColor = Color.Gray;
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    lblCopyFromPath.Text = "Select a page to see its path";
+                    lblCopyFromPath.Foreground = (IBrush?)Application.Current?.FindResource("SubtitleTextBrush") ?? Brushes.Gray;
+                });
             }
 
             // Fetch copy to page info
@@ -238,53 +171,70 @@ public partial class MainForm : Form
                     if (copyToPage != null)
                     {
                         var copyToHierarchy = await GetPageHierarchy(copyToPage);
-                        lblCopyToPath.Text = copyToHierarchy;
-                        lblCopyToPath.ForeColor = Color.DarkBlue;
+                        await Dispatcher.UIThread.InvokeAsync(() =>
+                        {
+                            lblCopyToPath.Text = copyToHierarchy;
+                            lblCopyToPath.Foreground = (IBrush?)Application.Current?.FindResource("StatusSuccessBrush") ?? Brushes.DarkBlue;
+                        });
                     }
                 }
                 catch
                 {
-                    lblCopyToPath.Text = "Invalid page or page not found";
-                    lblCopyToPath.ForeColor = Color.Red;
+                    await Dispatcher.UIThread.InvokeAsync(() =>
+                    {
+                        lblCopyToPath.Text = "Invalid page or page not found";
+                        lblCopyToPath.Foreground = (IBrush?)Application.Current?.FindResource("StatusErrorBrush") ?? Brushes.Red;
+                    });
                 }
             }
             else
             {
-                lblCopyToPath.Text = "Select a page to see its path";
-                lblCopyToPath.ForeColor = Color.Gray;
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    lblCopyToPath.Text = "Select a page to see its path";
+                    lblCopyToPath.Foreground = (IBrush?)Application.Current?.FindResource("SubtitleTextBrush") ?? Brushes.Gray;
+                });
             }
 
-            lblStatus.Text = "Page information updated";
-            lblStatus.ForeColor = Color.Green;
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                lblStatus.Text = "Page information updated";
+                lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusSuccessBrush") ?? Brushes.Green;
+            });
         }
         catch (Exception ex)
         {
             // Don't crash the app, just show a brief error
-            lblStatus.Text = $"Error fetching page info: {ex.Message}";
-            lblStatus.ForeColor = Color.Orange;
-
-            // Reset path labels on error
-            if (string.IsNullOrWhiteSpace(txtCopyFromPage.Text))
+            await Dispatcher.UIThread.InvokeAsync(() =>
             {
-                lblCopyFromPath.Text = "Select a page to see its path";
-                lblCopyFromPath.ForeColor = Color.Gray;
-            }
+                lblStatus.Text = $"Error fetching page info: {ex.Message}";
+                lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusWarningBrush") ?? Brushes.Orange;
 
-            if (string.IsNullOrWhiteSpace(txtCopyToPage.Text))
-            {
-                lblCopyToPath.Text = "Select a page to see its path";
-                lblCopyToPath.ForeColor = Color.Gray;
-            }
+                // Reset path labels on error
+                if (string.IsNullOrWhiteSpace(txtCopyFromPage.Text))
+                {
+                    lblCopyFromPath.Text = "Select a page to see its path";
+                    lblCopyFromPath.Foreground = (IBrush?)Application.Current?.FindResource("SubtitleTextBrush") ?? Brushes.Gray;
+                }
+
+                if (string.IsNullOrWhiteSpace(txtCopyToPage.Text))
+                {
+                    lblCopyToPath.Text = "Select a page to see its path";
+                    lblCopyToPath.Foreground = (IBrush?)Application.Current?.FindResource("SubtitleTextBrush") ?? Brushes.Gray;
+                }
+            });
 
             // Clear error after 3 seconds
-            var errorTimer = new System.Windows.Forms.Timer();
-            errorTimer.Interval = 3000;
+            var errorTimer = new DispatcherTimer();
+            errorTimer.Interval = TimeSpan.FromSeconds(3);
             errorTimer.Tick += (s, args) =>
             {
-                lblStatus.Text = "Ready";
-                lblStatus.ForeColor = Color.Blue;
+                Dispatcher.UIThread.InvokeAsync(() =>
+                {
+                    lblStatus.Text = "Ready";
+                    lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusReadyBrush") ?? Brushes.Blue;
+                });
                 errorTimer.Stop();
-                errorTimer.Dispose();
             };
             errorTimer.Start();
         }
@@ -330,14 +280,16 @@ public partial class MainForm : Form
         }
     }
 
-    private void BtnSettings_Click(object? sender, EventArgs e)
+    private async void BtnSettings_Click(object? sender, RoutedEventArgs e)
     {
-        using var settingsForm = new SettingsForm(settings);
-        if (settingsForm.ShowDialog() == DialogResult.OK)
+        var settingsWindow = new SettingsWindow(settings);
+        var result = await settingsWindow.ShowDialog<bool?>(this);
+        
+        if (result == true)
         {
-            settings = settingsForm.GetSettings();
+            settings = settingsWindow.GetSettings();
             lblStatus.Text = "Settings saved successfully.";
-            lblStatus.ForeColor = Color.Green;
+            lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusSuccessBrush") ?? Brushes.Green;
         }
     }
 
@@ -373,13 +325,21 @@ public partial class MainForm : Form
         throw new ArgumentException($"Could not extract page ID from: {input}. Please provide a valid page ID or URL.");
     }
 
-    private async void BtnCopy_Click(object? sender, EventArgs e)
+    private async void BtnCopy_Click(object? sender, RoutedEventArgs e)
     {
         // Check if we have valid settings based on auth type
         if (string.IsNullOrWhiteSpace(settings.ConfluenceUrl))
         {
-            MessageBox.Show("Please configure your Confluence settings first using the Settings button.",
-                "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            var dialog = new Window()
+            {
+                Title = "Settings Required",
+                Width = 400,
+                Height = 150,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner
+            };
+            
+            await ShowMessageBox("Please configure your Confluence settings first using the Settings button.",
+                "Settings Required");
             return;
         }
 
@@ -387,8 +347,8 @@ public partial class MainForm : Form
         {
             if (string.IsNullOrWhiteSpace(settings.ApiKey))
             {
-                MessageBox.Show("Please configure your API key in the Settings.",
-                    "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                await ShowMessageBox("Please configure your API key in the Settings.",
+                    "Settings Required");
                 return;
             }
         }
@@ -396,8 +356,8 @@ public partial class MainForm : Form
         {
             if (string.IsNullOrWhiteSpace(settings.Username) || string.IsNullOrWhiteSpace(settings.Password))
             {
-                MessageBox.Show("Please configure your username and password in the Settings.",
-                    "Settings Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                await ShowMessageBox("Please configure your username and password in the Settings.",
+                    "Settings Required");
                 return;
             }
         }
@@ -405,14 +365,14 @@ public partial class MainForm : Form
         if (string.IsNullOrWhiteSpace(txtCopyFromPage.Text) ||
             string.IsNullOrWhiteSpace(txtCopyToPage.Text))
         {
-            MessageBox.Show("Please enter both copy from and copy to page information.",
-                "Missing Page Information", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            await ShowMessageBox("Please enter both copy from and copy to page information.",
+                "Missing Page Information");
             return;
         }
 
-        btnCopy.Enabled = false;
+        btnCopy.IsEnabled = false;
         lblStatus.Text = "Copying content...";
-        lblStatus.ForeColor = Color.Blue;
+        lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusReadyBrush") ?? Brushes.Blue;
 
         try
         {
@@ -421,13 +381,44 @@ public partial class MainForm : Form
         catch (Exception ex)
         {
             lblStatus.Text = $"Error: {ex.Message}";
-            lblStatus.ForeColor = Color.Red;
-            MessageBox.Show($"An error occurred: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusErrorBrush") ?? Brushes.Red;
+            await ShowMessageBox($"An error occurred: {ex.Message}", "Error");
         }
         finally
         {
-            btnCopy.Enabled = true;
+            btnCopy.IsEnabled = true;
         }
+    }
+
+    private async Task ShowMessageBox(string message, string title)
+    {
+        var okButton = new Button
+        {
+            Content = "OK",
+            HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Center
+        };
+
+        var messageWindow = new Window()
+        {
+            Title = title,
+            Width = 400,
+            Height = 150,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            Content = new StackPanel
+            {
+                Margin = new Avalonia.Thickness(20),
+                Spacing = 10,
+                Children =
+                {
+                    new TextBlock { Text = message, TextWrapping = Avalonia.Media.TextWrapping.Wrap },
+                    okButton
+                }
+            }
+        };
+
+        okButton.Click += (s, e) => messageWindow.Close();
+        
+        await messageWindow.ShowDialog(this);
     }
 
     private async Task CopyPageContent()
@@ -435,8 +426,8 @@ public partial class MainForm : Form
         var baseUrl = settings.ConfluenceUrl.TrimEnd('/');
 
         // Extract page IDs from input (supports both IDs and URLs)
-        var copyFromPageId = ExtractPageId(txtCopyFromPage.Text);
-        var copyToPageId = ExtractPageId(txtCopyToPage.Text);
+        var copyFromPageId = ExtractPageId(txtCopyFromPage.Text ?? "");
+        var copyToPageId = ExtractPageId(txtCopyToPage.Text ?? "");
 
         // Initialize Confluence client
         var confluenceUri = new Uri(baseUrl);
@@ -505,23 +496,10 @@ public partial class MainForm : Form
 
         lblStatus.Text =
             $"Successfully copied content from '{copyFromTitle}' to '{copyToTitle}'. Version history opened in browser.";
-        lblStatus.ForeColor = Color.Green;
+        lblStatus.Foreground = (IBrush?)Application.Current?.FindResource("StatusSuccessBrush") ?? Brushes.Green;
 
-        MessageBox.Show(
+        await ShowMessageBox(
             $"Content successfully copied from '{copyFromTitle}' to '{copyToTitle}'!\n\nVersion history has been opened in your default browser.",
-            "Copy Successful", MessageBoxButtons.OK, MessageBoxIcon.Information);
-    }
-
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            debounceTimer?.Stop();
-            debounceTimer?.Dispose();
-            // IConfluenceClient doesn't implement IDisposable in this version
-            confluenceClient = null;
-        }
-
-        base.Dispose(disposing);
+            "Copy Successful");
     }
 }

@@ -1,0 +1,6 @@
+<linker>
+  <assembly fullname="ConfluenceCopier" preserve="All" />
+  <assembly fullname="Avalonia.Base" preserve="All" />
+  <assembly fullname="Avalonia.Controls" preserve="All" />
+  <assembly fullname="Avalonia.DesktopRuntime" preserve="All" />
+</linker>
