@@ -1,16 +1,26 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfluenceCopier", "ConfluenceCopier.csproj", "{8DA25316-E52F-4E6A-846F-99DC076F0A81}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfluenceCopier", "src\ConfluenceCopier\ConfluenceCopier.csproj", "{232A917C-004A-4202-B6E9-158CAF9C16D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfluenceCopier.Tests", "tests\ConfluenceCopier.Tests\ConfluenceCopier.Tests.csproj", "{1FA2B1E4-7F47-4473-A4AE-2C1137528FDD}"
+EndProject
+
+
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8DA25316-E52F-4E6A-846F-99DC076F0A81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8DA25316-E52F-4E6A-846F-99DC076F0A81}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8DA25316-E52F-4E6A-846F-99DC076F0A81}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8DA25316-E52F-4E6A-846F-99DC076F0A81}.Release|Any CPU.Build.0 = Release|Any CPU
+		{232A917C-004A-4202-B6E9-158CAF9C16D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{232A917C-004A-4202-B6E9-158CAF9C16D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{232A917C-004A-4202-B6E9-158CAF9C16D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{232A917C-004A-4202-B6E9-158CAF9C16D5}.Release|Any CPU.Build.0 = Release|Any CPU
+
+
+		{1FA2B1E4-7F47-4473-A4AE-2C1137528FDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FA2B1E4-7F47-4473-A4AE-2C1137528FDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FA2B1E4-7F47-4473-A4AE-2C1137528FDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FA2B1E4-7F47-4473-A4AE-2C1137528FDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

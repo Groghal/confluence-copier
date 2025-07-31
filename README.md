@@ -60,6 +60,22 @@ dotnet build
 dotnet run
 ```
 
+## 🧪 Development Guidelines
+
+### Testing Access to Internal Methods
+
+Rather than making private methods public just for testing:
+
+1. Use the `internal` access modifier for methods that need testing
+2. Add `[InternalsVisibleTo]` attribute in the main project to grant test access:
+
+```csharp
+// In AssemblyInfo.cs or the project file
+[assembly: InternalsVisibleTo("ConfluenceCopierTests")]
+```
+
+This approach maintains proper encapsulation while allowing tests to access implementation details.
+
 ## 📖 Usage
 
 ### 1. Initial Setup

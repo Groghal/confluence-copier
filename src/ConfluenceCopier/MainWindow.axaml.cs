@@ -239,7 +239,7 @@ public partial class MainWindow : Window
             errorTimer.Start();
         }
     }
-
+    
     private async Task<string> GetPageHierarchy(Content page)
     {
         try
@@ -293,10 +293,10 @@ public partial class MainWindow : Window
         }
     }
 
-    private string ExtractPageId(string input)
+    public string ExtractPageId(string input)
     {
         if (string.IsNullOrWhiteSpace(input))
-            return input;
+            throw new ArgumentException($"Could not extract page ID from: {input}. Please provide a valid page ID or URL.");
 
         // If it's already just a number, return it
         if (long.TryParse(input.Trim(), out _))
